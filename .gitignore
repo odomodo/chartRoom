@@ -1,8 +1,6 @@
 .DS_Store
-node_modules
 /dist
-/project/node_modules
-/vue3ts/node_modules
+*/node_modules
 
 
 
