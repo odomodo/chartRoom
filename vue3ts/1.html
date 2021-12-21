@@ -1,0 +1,39 @@
+<!--
+ * @Author: your name
+ * @Date: 2021-10-26 22:01:00
+ * @LastEditTime: 2021-11-01 22:13:07
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \vue3ts\1.html
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+function wait() {
+return new Promise(resolve =>
+ setTimeout(resolve, 1 * 1000)
+)
+}
+
+async function main() {
+console.time();
+const x = await wait();
+const y = await wait();
+const z = await wait();
+console.timeEnd();
+}
+main();
+
+  </script>
+</body>
+
+</html>
