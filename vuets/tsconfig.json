@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "esnext",
+    "target": "es5",
     "module": "esnext",
     "strict": true,
     "jsx": "preserve",
@@ -24,7 +24,7 @@
       "esnext",
       "dom",
       "dom.iterable",
-      "scripthost"
+      "scripthost", "es5", "es2015.promise" ,"es2015", "es2017"
     ]
   },
   "include": [

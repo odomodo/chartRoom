@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-10-24 11:23:15
- * @LastEditTime: 2021-10-28 00:01:01
+ * @LastEditTime: 2022-02-09 20:38:26
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \chatRoom\vue3ts\src\App.vue
@@ -39,10 +39,11 @@
 <script lang="ts">
 import { onMounted, ref, computed } from "vue";
 import { io } from "socket.io-client";
-import { useRoute, useRouter, onBeforeRouteLeave } from "vue-router";
+import { onBeforeRouteLeave } from "vue-router";
+
 export default {
-  name:"chartroom",
-  setup() {
+  name: "chartroom",
+  setup (): any {
     const list = ref([] as Array<any>)
     const inputValue = ref("")
     const count = ref(0)
@@ -65,7 +66,7 @@ export default {
         }
         return s.join('')
     })
-    const socket = io("http://47.112.238.202:10002/", {
+    const socket = io("http://localhost:10002/", {
       path: '/qwe/'
     });
     const handleClick = () => {
@@ -79,7 +80,7 @@ export default {
       socket.emit(events.SENDMESSAGE, obj);
       inputValue.value = ""
     }
-    let events :any = {}
+    let events : any = {}
     onMounted(() => {
       socket.on("返回所有连接方法", (data) => {
         events = data
@@ -91,7 +92,7 @@ export default {
       })
     })
     onBeforeRouteLeave(() => {
-      // socket.close()
+      socket.close()
     })
     return {
       list,
