@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-10-24 11:23:15
- * @LastEditTime: 2022-02-09 20:38:26
+ * @LastEditTime: 2022-02-15 16:44:50
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \chatRoom\vue3ts\src\App.vue
@@ -11,14 +11,14 @@
   <div class='left'>
     <div class='box'>
       <div v-for="(v, i) in list" :key="i">
-        <div v-if="v.id !== UID"  class="item">
+        <div  class="item">
           <img :src="v.imgUrl" class="head-portrait" />
           <div>
             <p class="name">{{v.name}}</p>
             <p class="content">{{v.data}}</p>
           </div>
         </div>
-        <div v-else class="self-item">
+        <div class="self-item">
           <div>
             <p class=" content self-content">{{v.data}}</p>
           </div>
@@ -37,9 +37,10 @@
 </template>
 
 <script lang="ts">
-import { onMounted, ref, computed } from "vue";
+import { onMounted, ref, reactive } from "vue";
 import { io } from "socket.io-client";
-import { onBeforeRouteLeave } from "vue-router";
+import { onBeforeRouteLeave, useRouter } from "vue-router";
+import { User } from "../type/index";
 
 export default {
   name: "chartroom",
@@ -47,25 +48,7 @@ export default {
     const list = ref([] as Array<any>)
     const inputValue = ref("")
     const count = ref(0)
-    const UID = computed((len = 8) => {
-      var chars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
-      var uuid = [], i;
-      let radix = chars.length;
-      for (i = 0; i < len; i++) uuid[i] = chars[0 | Math.random() * radix];
-      return uuid.join('');
-    })
-    const imgUrl = computed(() => {
-      let ind = Math.floor(Math.random() * 10) + 1
-      return `/images/${ind}.jpeg`
-    })
-    const uName = computed(() => {
-        let s = []
-        const hexDigits = '微软啊实打实大大商店VS辅导员和微软公司的v为啥让我十分出色的人多少啊散热'
-        for (let i = 0; i < 4; i++) {
-          s[i] = hexDigits[Math.floor(Math.random() * 36)]
-        }
-        return s.join('')
-    })
+    const Router = useRouter()
     const socket = io("http://localhost:10002/", {
       path: '/qwe/'
     });
@@ -73,34 +56,48 @@ export default {
       let data = inputValue.value
       let obj = {
         data,
-        name:uName.value,
-        id: UID.value,
-        imgUrl: imgUrl.value,
+        name: user.name,
+        imgUrl: user.url,
+        id: user.id
       }
       socket.emit(events.SENDMESSAGE, obj);
       inputValue.value = ""
     }
     let events : any = {}
+    let user = reactive({} as User)
     onMounted(() => {
-      socket.on("返回所有连接方法", (data) => {
-        events = data
-        console.log(data, '返回所有连接方法');
-        socket.on(events.RETURNMESSAGE, (data: any) => {
-          count.value = data.count
-          list.value = data.list
-        });
-      })
+      try {
+        user = JSON.parse(localStorage.getItem('user') || '')
+      } catch (error) {
+        console.log(error);
+      }
+      
+      if(user) {
+        socket.on("返回所有连接方法", (data) => {
+          events = data
+          console.log(data, '返回所有连接方法');
+          socket.on(events.RETURNMESSAGE, (data: any) => {
+            count.value = data.count
+            list.value = data.list
+          });
+        })
+      } else {
+        Router.push({
+          path: '/user'
+        })
+      }
+      console.log(process.env.VUE_APP_SECRET)
+      
     })
     onBeforeRouteLeave(() => {
       socket.close()
     })
     return {
+      user,
       list,
       handleClick,
       inputValue,
-      uName,
       count,
-      UID,
       events
     }
   }
