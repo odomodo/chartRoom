@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-10-26 22:01:00
- * @LastEditTime: 2021-11-01 22:13:07
+ * @LastEditTime: 2022-02-23 14:31:50
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \vue3ts\1.html
@@ -18,21 +18,20 @@
 
 <body>
   <script>
-function wait() {
-return new Promise(resolve =>
- setTimeout(resolve, 1 * 1000)
-)
-}
-
-async function main() {
-console.time();
-const x = await wait();
-const y = await wait();
-const z = await wait();
-console.timeEnd();
-}
-main();
-
+    let arr = [
+      { a: 1 },
+      { a: 2 },
+      { a: 3 },
+      { a: 4 },
+      { a: 5 },
+      { a: 6 },
+  ]
+  arr.map(v => {
+    if (v.a === 1) {
+      v.b = []
+    }
+  })
+  console.log(arr);
   </script>
 </body>
 

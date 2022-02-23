@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2022-02-09 20:39:40
- * @LastEditTime: 2022-02-15 15:11:43
+ * @LastEditTime: 2022-02-21 13:58:03
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: \chartRoom\vuets\src\views\user.vue
@@ -12,7 +12,6 @@
       <div class="item" v-for="i in 10" :key="i" :class="{ active : i === index}" @click="handleClick(i)">
         <img :src="`/images/${i}.jpeg`" alt="">
       </div>
-      
     </div>
     <div class="btns">
         <input type="text" v-model="input" class="input" placeholder="请输入名称">
@@ -24,6 +23,7 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { User } from "../type/index";
+import { uid } from "../utils/index"
 export default {
   name: "chartroom",
   setup (): any {
@@ -42,7 +42,8 @@ export default {
         const obj: User = {
           url: index.value,
           name: input.value,
-          id: new Date().valueOf()
+          id: uid(),
+          timer: new Date().valueOf(),
         }
         localStorage.setItem('user', JSON.stringify(obj))
         Router.push({

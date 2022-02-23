@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-10-26 20:29:38
- * @LastEditTime: 2021-10-27 23:56:02
+ * @LastEditTime: 2022-02-22 15:21:42
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \chatRoom\project\app.js
@@ -18,9 +18,7 @@ const logger = require('koa-logger')
 const cors = require('koa2-cors');
 const index = require('./routes/index')
 const users = require('./routes/users')
-
-const events = require('./common/event')
-
+const socket = require('./routes/socket')
 // error handler
 onerror(app)
 
@@ -51,45 +49,12 @@ app.use(async (ctx, next) => {
 // routes
 app.use(index.routes(), index.allowedMethods())
 app.use(users.routes(), users.allowedMethods())
+app.use(socket.routes(), socket.allowedMethods())
 
 // error-handling
 app.on('error', (err, ctx) => {
   console.error('server error', err, ctx)
 });
+require('./socket/index')
 
-
-const { createServer } = require("http");
-const { Server } = require("socket.io");
-const httpServer = createServer(app.callback());
-const io = new Server(httpServer, {
-  path: "/qwe/",
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
-  }
- });
-let obj = {
-  list: [],
-  count: 0
-};
-
-io.on("connection", (socket) => {
-  console.log('短链接连接成功');
-  const count = io.engine.clientsCount;
-  obj.count = count
-  socket.emit(events.ALLEVENTS, events)
-  socket.emit(events.RETURNMESSAGE, obj)
-  socket.on(events.SENDMESSAGE, (data) => {
-    const count = io.engine.clientsCount;
-    obj = {
-      list: [...obj.list??[], data],
-      count
-    }
-    socket.emit(events.RETURNMESSAGE, obj)
-    // 向所有人发送信息
-    socket.broadcast.emit(events.RETURNMESSAGE, obj)
-  });
-});
-
-httpServer.listen(10002);
 module.exports = app
