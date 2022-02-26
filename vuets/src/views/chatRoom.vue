@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-10-24 11:23:15
- * @LastEditTime: 2022-02-23 16:07:00
+ * @LastEditTime: 2022-02-25 19:54:36
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \chatRoom\vue3ts\src\App.vue
@@ -87,7 +87,7 @@ import { io } from "socket.io-client";
 import { onBeforeRouteLeave, useRouter } from "vue-router";
 import { User } from "../type/index";
 import { Events } from "../utils/events"
-import axios from 'axios'
+// import axios from 'axios'
 export default {
   name: "chartroom",
   setup (): any {
@@ -144,10 +144,9 @@ export default {
     }
 
     const getOne = () => {
-      console.log(341);
-      
       socket.on(Events.UPDATE_FRIEND_LIST, (data: any) => {
         parentList.value = data
+    
       })
     }
 

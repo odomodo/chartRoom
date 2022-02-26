@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2022-02-21 14:57:33
- * @LastEditTime: 2022-02-23 15:54:11
+ * @LastEditTime: 2022-02-25 15:47:18
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: \chartRoom\project\socket\index.js
@@ -49,7 +49,6 @@ function sendOne (socket, data) {
     }
   })
   const { name, id, url } = data.data
-  console.log('qwe', next, User[data.user.id]);
   if (!next) {
     User[data.user.id].list.push({
       name,
@@ -71,13 +70,13 @@ io.on("connection", (socket) => {
   // 用户第一次链接
   socket.on(events.NEW_CONNECT, (data) => {
     const { name, id, url } = data
-    !User.hasOwnProperty(data.id) && (User[data.id] = {
+     User[data.id] = {
       socket,
       name,
       id,
       url,
-      list: []
-    })
+      list: User[data.id]?.list || []
+    }
     sendAll(socket, data)
   })
 
