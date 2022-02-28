@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-12-18 14:13:37
- * @LastEditTime: 2022-02-23 14:53:25
+ * @LastEditTime: 2022-02-28 15:02:37
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: \chartRoom\project\common\event.js
@@ -14,6 +14,8 @@ const Events = {
   SEND_ONE: "私聊",
   NEW_CONNECT: "第一次链接",
   UPDATE_FRIEND_LIST: "更新好友列表",
+  SEND_ONE_MESSAGE: "私聊信息",
+  UPDATE_ONE_MESSAGE: "更新私聊信息"
 }
 
 module.exports = Events

@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2022-02-21 14:50:22
- * @LastEditTime: 2022-02-23 14:57:10
+ * @LastEditTime: 2022-02-28 15:00:12
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: \chartRoom\vuets\src\utils\events.ts
@@ -14,4 +14,6 @@ export const Events = {
   NEW_CONNECT: "第一次链接",
   SEND_ONE: "私聊",
   UPDATE_FRIEND_LIST: "更新好友列表",
+  SEND_ONE_MESSAGE: "私聊信息",
+  UPDATE_ONE_MESSAGE: "更新私聊信息"
 }

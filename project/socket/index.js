@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2022-02-21 14:57:33
- * @LastEditTime: 2022-02-25 15:47:18
+ * @LastEditTime: 2022-02-28 16:00:37
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: \chartRoom\project\socket\index.js
@@ -60,6 +60,43 @@ function sendOne (socket, data) {
   User[data.user.id].socket.emit(events.UPDATE_FRIEND_LIST, User[data.user.id].list)
 }
 
+// 私聊信息
+function sendOneMessage (socket, state) {
+  /**
+   * recipients: 收件人,
+   * addresser: 发件人
+   */
+  const { recipients, addresser } = state
+  User[addresser.id].list.map(v => {
+    if (v.id === recipients.id) {
+      v.data.push(addresser)
+    }
+  })
+  let next = false
+  User[recipients.id].list.map(v => {
+    if (v.id === addresser.id) {
+      next = true
+    }
+  })
+  if (next) {
+    User[recipients.id].list.map(v => {
+      if (v.id === addresser.id) {
+        v.data.push(addresser)
+      }
+    })
+  } else {
+    User[recipients.id].list.push({
+      name: addresser.name,
+      id: addresser.id,
+      url: addresser.url,
+      data: [addresser]
+    })
+  }
+
+  User[recipients.id].socket.emit(events.UPDATE_FRIEND_LIST, User[recipients.id].list)
+  User[addresser.id].socket.emit(events.UPDATE_FRIEND_LIST, User[addresser.id].list)
+}
+
 io.on("connection", (socket) => {
   
   // 接收到客户端信息
@@ -78,6 +115,7 @@ io.on("connection", (socket) => {
       list: User[data.id]?.list || []
     }
     sendAll(socket, data)
+    User[data.id].socket.emit(events.UPDATE_FRIEND_LIST, User[data.id].list)
   })
 
   // 私聊
@@ -85,6 +123,10 @@ io.on("connection", (socket) => {
     sendOne(socket, data)
   })
 
+  // 私聊信息
+  socket.on(events.SEND_ONE_MESSAGE, (data) => {
+    sendOneMessage(socket, data)
+  })
 });
 
 httpServer.listen(10002);

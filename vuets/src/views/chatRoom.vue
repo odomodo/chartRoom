@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-10-24 11:23:15
- * @LastEditTime: 2022-02-25 19:54:36
+ * @LastEditTime: 2022-02-28 15:47:17
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \chatRoom\vue3ts\src\App.vue
@@ -31,7 +31,7 @@
         </div>
         <p class="time">16: 00</p>
       </div>
-      <div class="item df" v-for="(v, i) in parentList" :key="i" :class="{ active: i === activeIndex }" @click="changeChat(i)">
+      <div class="item df" v-for="(v, i) in parentList" :key="i" :class="{ active: i === activeIndex }" @click="changeChat(i, v)">
         <img :src="`/images/${v.url}.jpeg`" alt="" class="img">
         <div class="text df fdc jcsb">
           <p>{{v.name}}</p>
@@ -43,7 +43,8 @@
       </div>
     </div>
   </div>
-  <div class="content">
+  <!-- 群聊 -->
+  <div class="content" v-if="activeIndex === -1">
     <div class="head df aic">
       群聊({{list?.count}})
     </div>
@@ -74,7 +75,42 @@
         <textarea cols="30" rows="10" class="text" v-model="inputValue"></textarea>
       </div>
       <div>
-        <button class="btn" @click="handleClick">发送</button>
+        <button class="btn" @click="handleClick('all')">发送</button>
+      </div>
+    </div>
+  </div>
+  <!-- 私聊 -->
+  <div class="content" v-else>
+    <div class="head df aic">
+      {{privateData.name}}
+    </div>
+    <div class="show">
+      <div class="item" v-for="(v, i) in privateData.data" :key="i">
+        <div
+          v-if="v.type === 'userMesg' && v.id !== user.id "
+          class="df other" @click="privateCchat(v)"
+        >
+          <img :src="`/images/${v.url}.jpeg`" alt="" class="img" >
+          <div class="box">
+            <p class="name">{{v.name}}</p>
+            <p class="content1">{{v.data}}</p>
+          </div>
+        </div>
+        <div v-if="v.type === 'userMesg' && v.id === user.id " class="df me fdrr">
+          <img :src="`/images/${v.url}.jpeg`" alt="" class="img">
+          <div class="box df fdc aife">
+            <p class="name">{{v.name}}</p>
+            <p class="content1">{{v.data}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="input">
+      <div class="text-box">
+        <textarea cols="30" rows="10" class="text" v-model="inputValue"></textarea>
+      </div>
+      <div>
+        <button class="btn" @click="handleClick('one')">发送</button>
       </div>
     </div>
   </div>
@@ -82,7 +118,7 @@
 </template>
 
 <script lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { io } from "socket.io-client";
 import { onBeforeRouteLeave, useRouter } from "vue-router";
 import { User } from "../type/index";
@@ -93,17 +129,20 @@ export default {
   setup (): any {
     const list = ref({}) // 聊天列表
     const inputValue = ref("")  // 输入内容
-    const activeIndex = ref(0 as number) // 对话框选中状态
+    const activeIndex = ref(-1 as number) // 对话框选中状态
     const Router = useRouter()
     const erroNums = ref(0) // 重连次数
     const parentList = ref([] as any) // 好友列表
+    const parentUser = ref({} as any) // 私聊对象
     let user = ref({} as User)
     const socket = io(`${process.env.VUE_APP_SECRET}` , {
       path: '/all/'
     });
-
+    const privateData = computed(() => {
+      return activeIndex.value >= 0 && parentList.value[activeIndex.value]
+    })
     // 发送消息
-    const handleClick = () => {
+    const handleClick = (type: string) => {
       let data = inputValue.value
       let obj = {
         data,
@@ -113,12 +152,30 @@ export default {
         timer: new Date().valueOf(),
         type: 'userMesg'
       }
-      socket.emit(Events.SEND_MESSAGE  , obj);
+      const func: any = {
+        all: () => {
+          socket.emit(Events.SEND_MESSAGE, obj);
+        },
+        one: () => {
+          /**
+           * recipients: 收件人,
+           * addresser: 发件人
+           */
+          console.log(parentUser.value, obj);
+          
+          socket.emit(Events.SEND_ONE_MESSAGE, {
+            recipients: parentUser.value,
+            addresser: obj,
+          });
+        }
+      }
+      func[type]()
       setTimeout(() => {
         const elemt: any = document.querySelector('.show')
         elemt.scrollTo(0,32000)
+        inputValue.value = ""
       }, 0);
-      inputValue.value = ""
+      
     }
 
     // 一开始链接socket
@@ -143,10 +200,15 @@ export default {
       })
     }
 
+    // 获取私聊信息
     const getOne = () => {
       socket.on(Events.UPDATE_FRIEND_LIST, (data: any) => {
         parentList.value = data
-    
+        data.map((v: any, i: number) => {
+          if (v.id === parentUser.value.id) {
+            activeIndex.value = i
+          }
+        })
       })
     }
 
@@ -169,14 +231,16 @@ export default {
 
     // 私聊
     const privateCchat = (data: any) => {
+      parentUser.value = data
       socket.emit(Events.SEND_ONE, {
         user: user.value,
         data
       })
     }
 
-    const changeChat = (data: number) => {
-      activeIndex.value = data
+    const changeChat = (num: number, data: any) => {
+      activeIndex.value = num
+      privateCchat(data)
     }
 
     onMounted(() => {
@@ -213,7 +277,9 @@ export default {
       Events,
       privateCchat,
       changeChat,
-      parentList
+      parentList,
+      privateData,
+      parentUser
     }
   }
 }
