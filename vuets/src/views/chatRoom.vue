@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-10-24 11:23:15
- * @LastEditTime: 2022-02-28 15:47:17
+ * @LastEditTime: 2022-02-28 17:09:14
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \chatRoom\vue3ts\src\App.vue
@@ -72,7 +72,7 @@
     </div>
     <div class="input">
       <div class="text-box">
-        <textarea cols="30" rows="10" class="text" v-model="inputValue"></textarea>
+        <textarea cols="30" rows="10" class="text" v-model="inputValue" @keyup.enter="handleClick('all')"></textarea>
       </div>
       <div>
         <button class="btn" @click="handleClick('all')">发送</button>
@@ -107,7 +107,7 @@
     </div>
     <div class="input">
       <div class="text-box">
-        <textarea cols="30" rows="10" class="text" v-model="inputValue"></textarea>
+        <textarea cols="30" rows="10" class="text" v-model="inputValue"  @keyup.enter="handleClick('one')"></textarea>
       </div>
       <div>
         <button class="btn" @click="handleClick('one')">发送</button>
@@ -143,6 +143,7 @@ export default {
     })
     // 发送消息
     const handleClick = (type: string) => {
+      event?.stopPropagation()
       let data = inputValue.value
       let obj = {
         data,
@@ -169,12 +170,14 @@ export default {
           });
         }
       }
-      func[type]()
-      setTimeout(() => {
-        const elemt: any = document.querySelector('.show')
-        elemt.scrollTo(0,32000)
-        inputValue.value = ""
-      }, 0);
+      if(data.length > 0 && data !=='\n') {
+        func[type]()
+        setTimeout(() => {
+          const elemt: any = document.querySelector('.show')
+          elemt.scrollTo(0,32000)
+          inputValue.value = ""
+        }, 0);
+      }
       
     }
 
@@ -197,6 +200,10 @@ export default {
       socket.on(Events.RETURN_MESSAGE, (data: any) => {
         console.log(data, 'dadad');
         list.value = data
+        setTimeout(() => {
+          const elemt: any = document.querySelector('.show')
+          elemt.scrollTo(0,32000)
+        }, 0);
       })
     }
 
@@ -204,6 +211,10 @@ export default {
     const getOne = () => {
       socket.on(Events.UPDATE_FRIEND_LIST, (data: any) => {
         parentList.value = data
+        setTimeout(() => {
+          const elemt: any = document.querySelector('.show')
+          elemt.scrollTo(0,32000)
+        }, 0);
         data.map((v: any, i: number) => {
           if (v.id === parentUser.value.id) {
             activeIndex.value = i
@@ -240,7 +251,7 @@ export default {
 
     const changeChat = (num: number, data: any) => {
       activeIndex.value = num
-      privateCchat(data)
+      num >= 0 && privateCchat(data) 
     }
 
     onMounted(() => {

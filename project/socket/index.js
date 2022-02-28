@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2022-02-21 14:57:33
- * @LastEditTime: 2022-02-28 16:00:37
+ * @LastEditTime: 2022-02-28 16:43:40
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: \chartRoom\project\socket\index.js
@@ -44,7 +44,7 @@ function sendAll (socket, data) {
 function sendOne (socket, data) {
   let next = false;
   User[data.user.id].list.map(v => {
-    if (v.id === data.data.id) {
+    if (v.id === data?.data?.id) {
       next = true
     }
   })
